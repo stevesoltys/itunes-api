@@ -43,7 +43,7 @@ public class FeedGenerator implements Serializable {
 	
 	private static final long serialVersionUID = 1501610083087L;
 
-	private static final String API_ENDPOINT = "https://rss.itunes.apple.com/api/v1/";
+	private static final String API_ENDPOINT = "https://rss.applemarketingtools.com/api/v2/";
 
 	private Country country = Country.UNITED_STATES;
 
@@ -75,11 +75,9 @@ public class FeedGenerator implements Serializable {
 				.append('/')
 				.append(feedType.getCode())
 				.append('/')
-				.append(genre)
-				.append('/')
 				.append(resultsLimit)
 				.append('/')
-				.append(allowExplicit ? "explicit" : "non-explicit")
+				.append(mediaType.getCode())
 				.append('.')
 				.append(format.getCode())
 				.toString();
