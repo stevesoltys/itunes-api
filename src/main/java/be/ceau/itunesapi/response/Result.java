@@ -121,7 +121,7 @@ public class Result implements Serializable {
 	private String sellerName;
 	private String minimumOsVersion;
 
-	private Integer averageUserRating;
+	private Double averageUserRating;
 	private Integer userRatingCount;
 
 	/**
@@ -829,11 +829,11 @@ public class Result implements Serializable {
 		this.minimumOsVersion = minimumOsVersion;
 	}
 
-	public Integer getAverageUserRating() {
+	public Double getAverageUserRating() {
 		return averageUserRating;
 	}
 
-	public void setAverageUserRating(Integer averageUserRating) {
+	public void setAverageUserRating(Double averageUserRating) {
 		this.averageUserRating = averageUserRating;
 	}
 
