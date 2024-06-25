@@ -39,211 +39,199 @@ import be.ceau.itunesapi.response.feedgenerator.Feed;
  */
 public class FeedGenerator implements Serializable {
 
-	private static final Logger logger = LoggerFactory.getLogger(FeedGenerator.class);
-	
-	private static final long serialVersionUID = 1501610083087L;
+    private static final Logger logger = LoggerFactory.getLogger(FeedGenerator.class);
 
-	private static final String API_ENDPOINT = "https://rss.applemarketingtools.com/api/v2/";
+    private static final long serialVersionUID = 1501610083087L;
 
-	private Country country = Country.UNITED_STATES;
+    private static final String API_ENDPOINT = "https://rss.applemarketingtools.com/api/v2/";
 
-	private MediaType mediaType = MediaType.APPLE_MUSIC;
+    private Country country = Country.UNITED_STATES;
 
-	private FeedType feedType = FeedType.NEW_MUSIC;
+    private MediaType mediaType = MediaType.APPLE_MUSIC;
 
-	// new field - very inconsistent values
-	private String genre = "all";
-	
-	private int resultsLimit = 10;
+    private FeedType feedType = FeedType.NEW_MUSIC;
 
-	private boolean allowExplicit = true;
+    private int resultsLimit = 10;
 
-	private FeedFormat format = FeedFormat.JSON;
+    private boolean allowExplicit = true;
 
-	/**
-	 * Construct a valid feed URL based on the current state of this
-	 * {@link FeedGenerator}
-	 * 
-	 * @return url as {@link String}, never {@code null}
-	 */
-	public String getUrl() {
-		return new StringBuilder()
-				.append(API_ENDPOINT)
-				.append(country.getIso().toLowerCase(Locale.ENGLISH))
-				.append('/')
-				.append(mediaType.getCode())
-				.append('/')
-				.append(feedType.getCode())
-				.append('/')
-				.append(resultsLimit)
-				.append('/')
-				.append(mediaType.getCode())
-				.append('.')
-				.append(format.getCode())
-				.toString();
-	}
+    private FeedFormat format = FeedFormat.JSON;
 
-	/**
-	 * Queries iTunes using the current state of this {@link FeedGenerator}
-	 * 
-	 * @return parsed {@link Feed}
-	 */
-	public Feed execute() {
-		return execute(URLConnector.INSTANCE);
-	}
+    /**
+     * Construct a valid feed URL based on the current state of this
+     * {@link FeedGenerator}
+     *
+     * @return url as {@link String}, never {@code null}
+     */
+    public String getUrl() {
+        return new StringBuilder()
+                .append(API_ENDPOINT)
+                .append(country.getIso().toLowerCase(Locale.ENGLISH))
+                .append('/')
+                .append(mediaType.getCode())
+                .append('/')
+                .append(feedType.getCode())
+                .append('/')
+                .append(resultsLimit)
+                .append('/')
+                .append(mediaType.getCode())
+                .append('.')
+                .append(format.getCode())
+                .toString();
+    }
 
-	/**
-	 * Execute this Feed Generator API request using the provided
-	 * {@link Connector} implementation.
-	 * 
-	 * @param connector
-	 *            {@link Connector} implementation, not {@code null}
-	 * @return parsed {@link Feed} response from iTunes
-	 * @throws IllegalArgumentException
-	 *             if argument {@code null}
-	 * @throws RuntimeException
-	 *             wrapping any {@link IOException} thrown performing the
-	 *             request or parsing the response
-	 */
-	public Feed execute(Connector connector) {
-		if (connector == null) {
-			throw new IllegalArgumentException("connector can not be null");
-		}
-		FeedFormat chosenFormat = getFormat();
-		setFormat(FeedFormat.JSON);
-		String url = getUrl();
-		setFormat(chosenFormat);
-		try {
-			String response = connector.get(url);
-			logger.trace("{} -> {}", url, response);
-			JsonNode json = Feed.READER.readTree(response).get("feed");
-			return Feed.READER.treeToValue(json, Feed.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /**
+     * Queries iTunes using the current state of this {@link FeedGenerator}
+     *
+     * @return parsed {@link Feed}
+     */
+    public Feed execute() {
+        return execute(URLConnector.INSTANCE);
+    }
 
-	public Country getCountry() {
-		return country;
-	}
+    /**
+     * Execute this Feed Generator API request using the provided
+     * {@link Connector} implementation.
+     *
+     * @param connector {@link Connector} implementation, not {@code null}
+     * @return parsed {@link Feed} response from iTunes
+     * @throws IllegalArgumentException if argument {@code null}
+     * @throws RuntimeException         wrapping any {@link IOException} thrown performing the
+     *                                  request or parsing the response
+     */
+    public Feed execute(Connector connector) {
+        if (connector == null) {
+            throw new IllegalArgumentException("connector can not be null");
+        }
+        FeedFormat chosenFormat = getFormat();
+        setFormat(FeedFormat.JSON);
+        String url = getUrl();
+        setFormat(chosenFormat);
+        try {
+            String response = connector.get(url);
+            logger.trace("{} -> {}", url, response);
+            JsonNode json = Feed.READER.readTree(response).get("feed");
+            return Feed.READER.treeToValue(json, Feed.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Default value is {@link Country#UNITED_STATES}
-	 * 
-	 * @param country
-	 *            a {@link Country}, not {@code null}
-	 * @return {@code this} instance for method chaining
-	 */
-	public FeedGenerator setCountry(Country country) {
-		if (country == null) {
-			throw new IllegalArgumentException("country must be specified");
-		}
-		this.country = country;
-		return this;
-	}
+    public Country getCountry() {
+        return country;
+    }
 
-	public MediaType getMediaType() {
-		return mediaType;
-	}
+    /**
+     * Default value is {@link Country#UNITED_STATES}
+     *
+     * @param country a {@link Country}, not {@code null}
+     * @return {@code this} instance for method chaining
+     */
+    public FeedGenerator setCountry(Country country) {
+        if (country == null) {
+            throw new IllegalArgumentException("country must be specified");
+        }
+        this.country = country;
+        return this;
+    }
 
-	/**
-	 * Default value is {@link MediaType#APPLE_MUSIC} <br>
-	 * <br>
-	 * Setting {@link MediaType} also changes the {@link FeedType} to be compatible
-	 * with the given {@link MediaType}
-	 * 
-	 * @param mediaType
-	 *            a {@link MediaType}, not {@code null}
-	 * @return {@code this} instance for method chaining
-	 */
-	public FeedGenerator setMediaType(MediaType mediaType) {
-		if (country == null) {
-			throw new IllegalArgumentException("mediaType must be specified");
-		}
-		this.mediaType = mediaType;
-		setFeedType(mediaType.getCompatibleFeedTypes().iterator().next());
-		return this;
-	}
+    public MediaType getMediaType() {
+        return mediaType;
+    }
 
-	public FeedType getFeedType() {
-		return feedType;
-	}
+    /**
+     * Default value is {@link MediaType#APPLE_MUSIC} <br>
+     * <br>
+     * Setting {@link MediaType} also changes the {@link FeedType} to be compatible
+     * with the given {@link MediaType}
+     *
+     * @param mediaType a {@link MediaType}, not {@code null}
+     * @return {@code this} instance for method chaining
+     */
+    public FeedGenerator setMediaType(MediaType mediaType) {
+        if (country == null) {
+            throw new IllegalArgumentException("mediaType must be specified");
+        }
+        this.mediaType = mediaType;
+        setFeedType(mediaType.getCompatibleFeedTypes().iterator().next());
+        return this;
+    }
 
-	/**
-	 * Default value is {@link FeedType#NEW_MUSIC} <br>
-	 * <br>
-	 * The given {@link FeedType} must be compatible with the current
-	 * {@link MediaType}. Refer to {@link MediaType#getCompatibleFeedTypes()} to
-	 * determine which {@link FeedType} instances are compatible with the current
-	 * {@link MediaType}.
-	 * 
-	 * @param feedType
-	 *            a {@link FeedType}, not {@code null}
-	 * @return {@code this} instance for method chaining
-	 * @see MediaType#getCompatibleFeedTypes()
-	 */
-	public FeedGenerator setFeedType(FeedType feedType) {
-		if (feedType == null) {
-			throw new IllegalArgumentException("feedType must be specified");
-		}
-		if (!mediaType.getCompatibleFeedTypes().contains(feedType)) {
-			throw new IllegalArgumentException("feedType must be compatible with mediaType");
-		}
-		this.feedType = feedType;
-		return this;
-	}
+    public FeedType getFeedType() {
+        return feedType;
+    }
 
-	public int getResultsLimit() {
-		return resultsLimit;
-	}
+    /**
+     * Default value is {@link FeedType#NEW_MUSIC} <br>
+     * <br>
+     * The given {@link FeedType} must be compatible with the current
+     * {@link MediaType}. Refer to {@link MediaType#getCompatibleFeedTypes()} to
+     * determine which {@link FeedType} instances are compatible with the current
+     * {@link MediaType}.
+     *
+     * @param feedType a {@link FeedType}, not {@code null}
+     * @return {@code this} instance for method chaining
+     * @see MediaType#getCompatibleFeedTypes()
+     */
+    public FeedGenerator setFeedType(FeedType feedType) {
+        if (feedType == null) {
+            throw new IllegalArgumentException("feedType must be specified");
+        }
+        if (!mediaType.getCompatibleFeedTypes().contains(feedType)) {
+            throw new IllegalArgumentException("feedType must be compatible with mediaType");
+        }
+        this.feedType = feedType;
+        return this;
+    }
 
-	/**
-	 * Default value is {@code 10} <br>
-	 * <br>
-	 * Note that Apple limits results to 200, even when more are requested
-	 * 
-	 * @param resultsLimit
-	 *            a positive integer
-	 * @return {@code this} instance for method chaining
-	 */
-	public FeedGenerator setResultsLimit(int resultsLimit) {
-		if (resultsLimit < 1) {
-			throw new IllegalArgumentException("resultsLimit must be a positive integer");
-		}
-		this.resultsLimit = resultsLimit;
-		return this;
-	}
+    public int getResultsLimit() {
+        return resultsLimit;
+    }
 
-	public boolean isAllowExplicit() {
-		return allowExplicit;
-	}
+    /**
+     * Default value is {@code 10} <br>
+     * <br>
+     * Note that Apple limits results to 200, even when more are requested
+     *
+     * @param resultsLimit a positive integer
+     * @return {@code this} instance for method chaining
+     */
+    public FeedGenerator setResultsLimit(int resultsLimit) {
+        if (resultsLimit < 1) {
+            throw new IllegalArgumentException("resultsLimit must be a positive integer");
+        }
+        this.resultsLimit = resultsLimit;
+        return this;
+    }
 
-	/**
-	 * Default value is {@code true}
-	 * 
-	 * @param allowExplicit
-	 *            true if explicit results may be included
-	 * @return {@code this} instance for method chaining
-	 */
-	public FeedGenerator setAllowExplicit(boolean allowExplicit) {
-		this.allowExplicit = allowExplicit;
-		return this;
-	}
+    public boolean isAllowExplicit() {
+        return allowExplicit;
+    }
 
-	public FeedFormat getFormat() {
-		return format;
-	}
+    /**
+     * Default value is {@code true}
+     *
+     * @param allowExplicit true if explicit results may be included
+     * @return {@code this} instance for method chaining
+     */
+    public FeedGenerator setAllowExplicit(boolean allowExplicit) {
+        this.allowExplicit = allowExplicit;
+        return this;
+    }
 
-	/**
-	 * Default value is {@link FeedFormat#JSON}
-	 * 
-	 * @param format
-	 *            a {@link FeedFormat}, not {@code null}
-	 * @return {@code this} instance for method chaining
-	 */
-	public FeedGenerator setFormat(FeedFormat format) {
-		this.format = format;
-		return this;
-	}
+    public FeedFormat getFormat() {
+        return format;
+    }
+
+    /**
+     * Default value is {@link FeedFormat#JSON}
+     *
+     * @param format a {@link FeedFormat}, not {@code null}
+     * @return {@code this} instance for method chaining
+     */
+    public FeedGenerator setFormat(FeedFormat format) {
+        this.format = format;
+        return this;
+    }
 
 }
