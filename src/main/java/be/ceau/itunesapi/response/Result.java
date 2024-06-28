@@ -15,13 +15,13 @@
 */
 package be.ceau.itunesapi.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Single result in an iTunes {@link Response}.
@@ -33,6 +33,8 @@ public class Result implements Serializable {
 
 	private String wrapperType;
 	private String kind;
+
+	private String artistType;
 
 	private Long artistId;
 	private Long collectionId;
@@ -843,6 +845,14 @@ public class Result implements Serializable {
 
 	public void setUserRatingCount(Integer userRatingCount) {
 		this.userRatingCount = userRatingCount;
+	}
+
+	public String getArtistType() {
+		return artistType;
+	}
+
+	public void setArtistType(String artistType) {
+		this.artistType = artistType;
 	}
 
 	@Override
