@@ -49,6 +49,7 @@ public class Result implements Serializable {
 	private String trackCensoredName;
 
 	private String artistViewUrl;
+	private String artistLinkUrl;
 	private String collectionViewUrl;
 	private String trackViewUrl;
 	private String feedUrl;
@@ -260,6 +261,19 @@ public class Result implements Serializable {
 
 	public void setArtistViewUrl(String artistViewUrl) {
 		this.artistViewUrl = artistViewUrl;
+	}
+
+	/**
+	 * A URL to view the artist in the iTunes Store.
+	 *
+	 * @return String
+	 */
+	public String getArtistLinkUrl() {
+		return artistLinkUrl;
+	}
+
+	public void setArtistLinkUrl(String artistLinkUrl) {
+		this.artistLinkUrl = artistLinkUrl;
 	}
 
 	/**
